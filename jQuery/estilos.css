@@ -1,0 +1,16 @@
+#resultados {
+	width: 100%;
+	position: relative;
+	float: left;
+}
+
+.resultado {
+	width: 30%;
+	height: 100px;
+	position: relative;
+	float: left;
+	margin-left: 35%;
+	margin-top: 30px;
+	background-color: #abc;
+	text-align: center;
+}
