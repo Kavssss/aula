@@ -1,0 +1,63 @@
+body{
+	background-color: #333 !important;
+}
+
+.logo{
+	position: relative;
+	float: left;
+	width: 190px;
+	height: 45px;
+	left: 10px;
+}
+
+#topicos{
+	color: #ddd;
+	font-family: 'Alumni Sans', sans-serif;
+	font-size: 18pt;
+	margin-top: 10px;
+}
+
+#topicos:hover{
+	color: #666;
+}
+
+#active{
+	color: #666;
+	font-family: 'Alumni Sans', sans-serif;
+	font-size: 18pt;
+	margin-top: 10px;
+}
+
+#titulos{
+	color: #ddd;
+	font-family: 'Audiowide', sans-serif;
+	font-size: 28pt;
+	margin-top: 25px;
+	margin-bottom: 15px;
+}
+
+.sites{
+	width: 200px;
+	height: 200px;
+	margin-top: 30px;
+}
+
+.legendaSite{
+	color: #fff;
+	font-size: 14pt;
+}
+
+.col:hover h2{
+	color: #888;
+}
+
+.col{
+	text-align: center;
+}
+
+footer{
+	width: 100%;
+	height: 70px;
+	background-color: #212529;
+	margin-top: 35px;
+}
