@@ -1,180 +1,182 @@
 #define GLUT_DISABLE_ATEXIT_HACK
+
+/*
+======== Teste OpenGL ==================
+Nairon Neri Silva
+Versão 1.0
+Programa teste da configuração do GLUT
+Desenha um quadrado vermelho na tela
+========================================
+*/
+
 #include <windows.h>
 #include <GL/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
-float telaX = 800.0f, telaY = 600.0f, espessura = 1;
-int r, g, b, y, clique=0;
-int matriz[100][8], linha=0;
+float velocidade=1;
+float x1=0, y1=0, x2=0, y2=0;
+int direcao1=1, direcao2=1;
 
-void desenhaLinha(){
-    if(clique==4){
-        matriz[linha-1][4] = (int)espessura;
-        matriz[linha-1][5] = r;
-        matriz[linha-1][6] = g;
-        matriz[linha-1][7] = b;
+void desenhaQuadrado(int r, int g, int b);
+int autorizaMovimento(float x, float y, int direcao);
+void desenhaCenario();
 
-        for(int i=0; i<linha; i++){
-            glColor3ub(matriz[i][5], matriz[i][6], matriz[i][7]);
-            glLineWidth(matriz[i][4]);
-            printf("var espessura: %d - espessura da linha %d: %d\n", espessura, i, matriz[i][4]);
-            glBegin(GL_LINES);
-                glVertex2i(matriz[i][0], matriz[i][1]);
-                glVertex2i(matriz[i][2], matriz[i][3]);
-            glEnd();
-        }
 
-    }
-}
 
 //Função callback para desenho
-void desenha(void) {
+void desenha(void)
+{
     //Inicializa o sistema de coordenadas
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
     //Define os limites dos eixos x e y
     //Argumentos da função: void gluOrtho2D(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top)
-    gluOrtho2D (0.0f, telaX, 0.0f, telaY);
+    gluOrtho2D (0.0f, 900.0f, 0.0f, 600.0f);
 
 	//Limpa todos os pixels com a cor de fundo
 	glClear(GL_COLOR_BUFFER_BIT);
 
-    desenhaLinha();
+	desenhaCenario();
+
+	glPushMatrix();
+        glTranslatef(300, 0, 0);
+        desenhaQuadrado(255, 0, 0);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(x1, y1, 0);
+        desenhaQuadrado(255, 255, 0);
+    glPopMatrix();
+
+
+
+    glutPostRedisplay();
 
 	//Habilita a execução de comandos OpenGL
 	glFlush();
 }
 
-void keyboard(unsigned char key, int x, int y){
-    switch(key){
-        case 'a':
-            glClear(GL_COLOR_BUFFER_BIT);
-            glFlush();
-            r = g = b = linha = 0;
-            espessura = 1;
-            printf("Limpo\n");
-            break;
-        case '+':
-            if(espessura < 33) espessura++;
-            printf("Espessura: %.0f\n", espessura);
-            break;
-        case '-':
-            if(espessura > 1) espessura--;
-            printf("Espessura: %.0f\n", espessura);
-            break;
-        case '1':
-            r = 255;
-            g = 0;
-            b = 0;
-            break;
-        case '2':
-            r = 0;
-            g = 255;
-            b = 0;
-            break;
-        case '3':
-            r = 0;
-            g = 0;
-            b = 255;
-            break;
-        case '4':
-            r = 0;
-            g = 0;
-            b = 0;
-            break;
-        case '5':
-            r = 255;
-            g = 255;
-            b = 0;
-            break;
-        case '6':
-            r = 255;
-            g = 0;
-            b = 150;
-            break;
-        case '7':
-            r = 255;
-            g = 120;
-            b = 0;
-            break;
-        case '8':
-            r = 150;
-            g = 150;
-            b = 150;
-            break;
-        case '9':
-            r = 100;
-            g = 50;
-            b = 0;
-            break;
+void desenhaCenario() {
+    glColor3ub(255, 255, 255);
+    glBegin(GL_QUADS);
+        glVertex2i(10, 20);
+        glVertex2i(10, 35);
+        glVertex2i(890, 35);
+        glVertex2i(890, 20);
+
+        glVertex2i(10, 580);
+        glVertex2i(10, 565);
+        glVertex2i(890, 565);
+        glVertex2i(890, 580);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glLineWidth(5.0);
+    for(int i = 20; i < 15; i++) {
+        glVertex2i(450, 580);
     }
+    glEnd();
 }
 
-/*void specialKeyboard(int key, int x, int y){
-    if (key == GLUT_KEY_LEFT){
-        printf("Tecla direcional ESQUERDA pressionada\n");
-    }
+int autorizaMovimento(float x, float y, int direcao){
+    //1 - Direita / 2 - Esquerda
+    //3 - Para Cima / 4 - Para Baixo
 
-    if (key == GLUT_KEY_RIGHT){
-        printf("Tecla direcional DIREITA pressionada\n");
-    }
-}*/
+    printf("X: %f / Y: %f\n", x1, y1);
 
-void mouse(int button, int state, int x, int y){
-    y = telaY - y;
-
-    if(clique==4) clique=0;
-
-    if (button == GLUT_LEFT_BUTTON){
-        if (state == GLUT_UP){
-            printf("Coordenadas: x: %d | y: %d\n", x, y);
-            matriz[linha][clique] = x;
-            matriz[linha][clique+1] = y;
-            clique+=2;
-
-            if(clique==4){
-                glutPostRedisplay();
-                linha++;
-            }
+    if ((direcao == 1) && (x < 450)){
+        if ((x > 250) && (x < 350) && (y < 50)){
+            return false;
         }
+        return true;
+    }else if ((direcao == 2) && (x > 0)){
+        if ((x > 250) && (x < 350) && (y < 50)){
+            return false;
+        }
+        return true;
+    }else if ((direcao == 3) && (y < 450)){
+        return true;
+    }else if ((direcao == 4) && (y > 0)){
+        return true;
+    }else if ((direcao == 5) && (x <= 450) && (y <= 450)){
+        return true;
+    }else if ((direcao == 6) && (x >= 0) && (y >= 0)){
+        return true;
+    }else if ((direcao == 7) && (x <= 450) && (y >= 0)){
+        return true;
+    }else if ((direcao == 8) && (x >= 0) && (y <= 450)){
+        return true;
+    }else{
+        return false;
     }
 }
 
+void desenhaQuadrado(int r, int g, int b){
+    // Desenha um quadrado preenchido com a cor corrente
+    glColor3ub(r, g, b);
+    glBegin(GL_QUADS);
+               glVertex2i(0,50);
+               glVertex2i(0,0);
+               glVertex2i(50,0);
+               glVertex2i(50,50);
+    glEnd();
+}
+
+void specialKeyboard(int key, int x, int y){
+    if ((key == GLUT_KEY_RIGHT) && autorizaMovimento(x1, y1, 1)){
+        x1 += velocidade;
+    }
+
+    if ((key == GLUT_KEY_LEFT) && autorizaMovimento(x1, y1, 2)){
+        x1 -= velocidade;
+    }
+
+    if ((key == GLUT_KEY_UP) && autorizaMovimento(x1, y1, 3)){
+        y1 += velocidade;
+    }
+
+    if ((key == GLUT_KEY_DOWN) && autorizaMovimento(x1, y1, 4)){
+        y1 -= velocidade;
+    }
+}
 
 //Inicializa parâmetros
-void init (void){
-    // Configura a cor de fundo
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+void init (void)
+{
+    // Configura a cor de fundo como preta
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    direcao1 = rand()%8+1;
+    direcao2 = rand()%8+1;
 }
 
 //Principal
 int main(void)
 {
+    srand(time(NULL));
     //Tipo de janela (single-buffered) e cores utilizados
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 
 	//Configura o tamanho da janela
-	glutInitWindowSize (telaX, telaY);
+	glutInitWindowSize (900, 600);
 
 	//Configura a posição inicial da janela
-	glutInitWindowPosition (283, 50);
+	glutInitWindowPosition (100, 100);
 
 	//Configura a janela
-	glutCreateWindow("Lines");
+	glutCreateWindow("Teste do OpenGL");
+
+	//Callback de teclas especiais
+	glutSpecialFunc(specialKeyboard);
 
 	//Chama a função desenha
 	glutDisplayFunc(desenha);
-
-	//Callback de teclas normais
-	glutKeyboardFunc(keyboard);
-
-	//Callback de teclas especiais
-	//glutSpecialFunc(specialKeyboard);
-
-	//Callback do Mouse
-	glutMouseFunc(mouse);
 
 	//Inicializa o programa
 	init();
