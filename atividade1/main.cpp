@@ -86,10 +86,7 @@ void desenhaCenario() {
 int autorizaMovimento(float x, float y, int direcao){
     printf("X: %f / Y: %f\n", x1, y1);
 
-    if ((direcao == 1) && (y < 450)){
-        if ((x > 250) && (x < 350) && (y < 50)){
-            return false;
-        }
+    if ((direcao == 1) && (y < 790)) return true;
         return true;
     }else if ((direcao == 2) && (x > 0)){
         if ((x > 250) && (x < 350) && (y < 50)){
