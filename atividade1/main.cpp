@@ -19,7 +19,7 @@ float velocidade=1;
 float x1=0, y1=0, x2=0, y2=0;
 int direcao1=1, direcao2=1;
 
-void desenhaQuadrado(int r, int g, int b);
+void desenhaPlataforma();
 int autorizaMovimento(float x, float y, int direcao);
 void desenhaCenario();
 
@@ -45,16 +45,14 @@ void desenha(void)
 	desenhaCenario();
 
 	glPushMatrix();
-        glTranslatef(300, 0, 0);
-        desenhaQuadrado(255, 0, 0);
+        glTranslated(10, 250, 0);
+        desenhaPlataforma();
+	glPopMatrix();
+
+	glPushMatrix();
+        glTranslated(875, 250, 0);
+        desenhaPlataforma();
     glPopMatrix();
-
-    glPushMatrix();
-        glTranslatef(x1, y1, 0);
-        desenhaQuadrado(255, 255, 0);
-    glPopMatrix();
-
-
 
     glutPostRedisplay();
 
@@ -76,21 +74,19 @@ void desenhaCenario() {
         glVertex2i(890, 580);
     glEnd();
 
+    glLineWidth(20.0);
     glBegin(GL_LINES);
-    glLineWidth(5.0);
-    for(int i = 20; i < 15; i++) {
-        glVertex2i(450, 580);
+    for(int i = 20; i < 580; i+=38) {
+        glVertex2i(450, i);
+        glVertex2i(450, i+19);
     }
     glEnd();
 }
 
 int autorizaMovimento(float x, float y, int direcao){
-    //1 - Direita / 2 - Esquerda
-    //3 - Para Cima / 4 - Para Baixo
-
     printf("X: %f / Y: %f\n", x1, y1);
 
-    if ((direcao == 1) && (x < 450)){
+    if ((direcao == 1) && (y < 450)){
         if ((x > 250) && (x < 350) && (y < 50)){
             return false;
         }
@@ -117,14 +113,13 @@ int autorizaMovimento(float x, float y, int direcao){
     }
 }
 
-void desenhaQuadrado(int r, int g, int b){
-    // Desenha um quadrado preenchido com a cor corrente
-    glColor3ub(r, g, b);
+void desenhaPlataforma(){
+    glColor3ub(255, 255, 255);
     glBegin(GL_QUADS);
-               glVertex2i(0,50);
-               glVertex2i(0,0);
-               glVertex2i(50,0);
-               glVertex2i(50,50);
+        glVertex2i(0, 0);
+        glVertex2i(0, 100);
+        glVertex2i(15, 100);
+        glVertex2i(15, 0);
     glEnd();
 }
 
