@@ -1,33 +1,58 @@
 #define GLUT_DISABLE_ATEXIT_HACK
-
-/*
-======== Teste OpenGL ==================
-Nairon Neri Silva
-Versão 1.0
-Programa teste da configuração do GLUT
-Desenha um quadrado vermelho na tela
-========================================
-*/
-
 #include <windows.h>
 #include <GL/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+//#include <math.h>
 
-float velocidade=1;
-float x1=0, y1=0, x2=0, y2=0;
-int direcao1=1, direcao2=1;
+float velocidadePlataforma = 15.0, velocidadeBola = 0.18;
+float y1 = 250.0, y2 = 250.0, bolax = 442.0, bolay = 300.0;
+int movimento = 0, cont = 0;
 
-void desenhaPlataforma();
-int autorizaMovimento(float x, float y, int direcao);
+void desenha(void);
 void desenhaCenario();
+void desenhaPlataforma();
+void desenhaBola();
+int autorizaMovimento(float y, int direcao);
+void Key(unsigned char key, int x, int y);
+void specialKeyboard(int key, int x, int y);
+void init(void);
+void movimentoBola();
+void circulo();
 
+int main(void) {
+    srand(time(NULL));
+    movimento = rand()%4;
 
+    //Tipo de janela (single-buffered) e cores utilizados
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 
-//Função callback para desenho
-void desenha(void)
-{
+	//Configura o tamanho da janela
+	glutInitWindowSize (900, 600);
+
+	//Configura a posição inicial da janela
+	glutInitWindowPosition (100, 100);
+
+	//Configura a janela
+	glutCreateWindow("Jogo Pong");
+
+	glutKeyboardFunc(Key);
+
+	//Callback de teclas especiais
+	glutSpecialFunc(specialKeyboard);
+
+	//Chama a função desenha
+	glutDisplayFunc(desenha);
+
+	//Inicializa o programa
+	init();
+
+	//Habilita o loop (máquina de estados)
+	glutMainLoop();
+}
+
+void desenha(void) { //Função callback para desenho
     //Inicializa o sistema de coordenadas
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -39,25 +64,89 @@ void desenha(void)
     //Argumentos da função: void gluOrtho2D(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top)
     gluOrtho2D (0.0f, 900.0f, 0.0f, 600.0f);
 
-	//Limpa todos os pixels com a cor de fundo
-	glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT); //Limpa todos os pixels com a cor de fundo
 
 	desenhaCenario();
 
 	glPushMatrix();
-        glTranslated(10, 250, 0);
+        glTranslated(10, y1, 0);
         desenhaPlataforma();
 	glPopMatrix();
 
 	glPushMatrix();
-        glTranslated(875, 250, 0);
+        glTranslated(875, y2, 0);
         desenhaPlataforma();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslated(bolax, bolay, 0);
+        desenhaBola();
+        //circulo();
+        movimentoBola();
     glPopMatrix();
 
     glutPostRedisplay();
 
-	//Habilita a execução de comandos OpenGL
-	glFlush();
+	glFlush(); //Habilita a execução de comandos OpenGL
+}
+
+void movimentoBola() {
+    if(movimento == 0) {
+        bolax -= velocidadeBola;
+        if(bolay < 550) bolay += velocidadeBola;
+        else movimento = 2;
+        if(bolax < 25) {
+            if((bolay > y1) && (bolay < y1 + 100)) {
+                printf("Boa!\n");
+                cont++;
+                movimento = 1;
+            }
+        }
+    }
+
+    if(movimento == 1) {
+        bolax += velocidadeBola;
+        if(bolay < 550) bolay += velocidadeBola;
+        else movimento = 3;
+        if(bolax > 860) {
+            if((bolay > y2) && (bolay < y2 + 100)) {
+                printf("Boa!\n");
+                cont++;
+                movimento = 0;
+            }
+        }
+    }
+
+    if(movimento == 2) {
+        bolax -= velocidadeBola;
+        if(bolay > 35) bolay -= velocidadeBola;
+        else movimento = 0;
+        if(bolax < 25) {
+            if((bolay > y1) && (bolay < y1 + 100)) {
+                printf("Boa!\n");
+                cont++;
+                movimento = 3;
+            }
+        }
+    }
+
+    if(movimento == 3) {
+        bolax += velocidadeBola;
+        if(bolay > 35) bolay -= velocidadeBola;
+        else movimento = 1;
+        if(bolax > 860) {
+            if((bolay > y2) && (bolay < y2 + 100)) {
+                printf("Boa!\n");
+                cont++;
+                movimento = 2;
+            }
+        }
+    }
+
+    if(cont == 5) {
+        velocidadeBola += 0.01;
+        cont = 0;
+    }
 }
 
 void desenhaCenario() {
@@ -83,34 +172,7 @@ void desenhaCenario() {
     glEnd();
 }
 
-int autorizaMovimento(float x, float y, int direcao){
-    printf("X: %f / Y: %f\n", x1, y1);
-
-    if ((direcao == 1) && (y < 790)) return true;
-        return true;
-    }else if ((direcao == 2) && (x > 0)){
-        if ((x > 250) && (x < 350) && (y < 50)){
-            return false;
-        }
-        return true;
-    }else if ((direcao == 3) && (y < 450)){
-        return true;
-    }else if ((direcao == 4) && (y > 0)){
-        return true;
-    }else if ((direcao == 5) && (x <= 450) && (y <= 450)){
-        return true;
-    }else if ((direcao == 6) && (x >= 0) && (y >= 0)){
-        return true;
-    }else if ((direcao == 7) && (x <= 450) && (y >= 0)){
-        return true;
-    }else if ((direcao == 8) && (x >= 0) && (y <= 450)){
-        return true;
-    }else{
-        return false;
-    }
-}
-
-void desenhaPlataforma(){
+void desenhaPlataforma() {
     glColor3ub(255, 255, 255);
     glBegin(GL_QUADS);
         glVertex2i(0, 0);
@@ -120,59 +182,42 @@ void desenhaPlataforma(){
     glEnd();
 }
 
-void specialKeyboard(int key, int x, int y){
-    if ((key == GLUT_KEY_RIGHT) && autorizaMovimento(x1, y1, 1)){
-        x1 += velocidade;
-    }
+void desenhaBola() {
+    glColor3ub(255, 255, 255);
+    glBegin(GL_QUADS);
+        glVertex2i(0, 0);
+        glVertex2i(0, 15);
+        glVertex2i(15, 15);
+        glVertex2i(15, 0);
+    glEnd();
+}
+/*
+void circulo(){
+    float angulo;
+    glBegin(GL_POLYGON);
+        for(int i=0; i<360; i++){
+            angulo = i * 2 * M_PI / 360;
+            glVertex2f(450 + (cos(angulo) * 15), 300 + (sin(angulo) * 15));
+        }
+    glEnd();
+}*/
 
-    if ((key == GLUT_KEY_LEFT) && autorizaMovimento(x1, y1, 2)){
-        x1 -= velocidade;
-    }
-
-    if ((key == GLUT_KEY_UP) && autorizaMovimento(x1, y1, 3)){
-        y1 += velocidade;
-    }
-
-    if ((key == GLUT_KEY_DOWN) && autorizaMovimento(x1, y1, 4)){
-        y1 -= velocidade;
-    }
+int autorizaMovimento(float y, int direcao) {
+    if ((direcao == 1) && (y < 465)) return true;
+    else if ((direcao == 0) && (y > 35)) return true;
+    else return false;
 }
 
-//Inicializa parâmetros
-void init (void)
-{
-    // Configura a cor de fundo como preta
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    direcao1 = rand()%8+1;
-    direcao2 = rand()%8+1;
+void Key(unsigned char key, int x, int y) {
+    if((key == 119) && (autorizaMovimento(y1, 1))) y1 += velocidadePlataforma;
+    if((key == 115) && (autorizaMovimento(y1, 0))) y1 -= velocidadePlataforma;
 }
 
-//Principal
-int main(void)
-{
-    srand(time(NULL));
-    //Tipo de janela (single-buffered) e cores utilizados
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+void specialKeyboard(int key, int x, int y) {
+    if((key == GLUT_KEY_UP) && (autorizaMovimento(y2, 1))) y2 += velocidadePlataforma;
+    if((key == GLUT_KEY_DOWN) && (autorizaMovimento(y2, 0))) y2 -= velocidadePlataforma;
+}
 
-	//Configura o tamanho da janela
-	glutInitWindowSize (900, 600);
-
-	//Configura a posição inicial da janela
-	glutInitWindowPosition (100, 100);
-
-	//Configura a janela
-	glutCreateWindow("Teste do OpenGL");
-
-	//Callback de teclas especiais
-	glutSpecialFunc(specialKeyboard);
-
-	//Chama a função desenha
-	glutDisplayFunc(desenha);
-
-	//Inicializa o programa
-	init();
-
-	//Habilita o loop (máquina de estados)
-	glutMainLoop();
+void init(void) { //Inicializa parâmetros
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Configura a cor de fundo como preta
 }
