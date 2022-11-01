@@ -249,10 +249,11 @@
 	<stdio.h>
 	<time.h>
 
-1666927881 source:c:\users\flavio morais\documents\github\aula\atividade1\main.cpp
+1667261832 source:c:\users\flavio morais\documents\github\aula\atividade1\main.cpp
 	<windows.h>
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
+	<string.h>
 	<time.h>
 
